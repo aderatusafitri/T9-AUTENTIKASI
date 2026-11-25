@@ -78,17 +78,17 @@ Kode untuk token: `TOKEN_DIPERLUKAN` (header tidak ada atau bukan Bearer) dan `T
 ## Pengujian
 Tabel `users` di phpMyAdmin. Kolom `passwordHash` berisi hash bcrypt, bukan password asli:
 
-![Tabel users](screenshot/01-users-hash.png)
+![Tabel users](screenshot/01-users-hash.png.png)
 
 Halaman publik (kiri) bisa dibuka tanpa token, sedangkan halaman wajib login (kanan) ditolak tanpa token:
 
 | Request 3: GET /products tanpa token (200) | Request 4: POST /products tanpa token (401) |
 |---|---|
-| ![Request 3](screenshot/02-request3-publik.png) | ![Request 4](screenshot/03-request4-tanpa-token.png) |
+| ![Request 3](screenshot/02-request3-publik.png.png) | ![Request 4](screenshot/03-request4-tanpa-token.png.png) |
 
 Request 5: POST /products dengan token berhasil (201):
 
-![Request 5](screenshot/04-request5-dengan-token.png)
+![Request 5](screenshot/04-request5-dengan-token.png.png)
 
 File `requests.http` di VS Code:
 
