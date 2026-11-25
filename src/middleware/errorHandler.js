@@ -1,37 +1,30 @@
+const kirim = (res, status, pesan, kode) =>
+  res.status(status).json({ error: { pesan, kode } });
+
 const errorHandler = (err, req, res, next) => {
   if (err.isOperational) {
-    return res.status(err.statusCode).json({
-      status: "error",
-      pesan: err.message,
-    });
+    return kirim(res, err.statusCode, err.message, err.kode);
   }
 
   if (err.type === "entity.parse.failed") {
-    return res.status(400).json({
-      status: "error",
-      pesan: "Format JSON tidak valid",
-    });
+    return kirim(res, 400, "Format JSON tidak valid", "JSON_TIDAK_VALID");
   }
 
   if (err.code === "P2002") {
-    return res.status(409).json({
-      status: "error",
-      pesan: "Data dengan nilai unik tersebut sudah ada",
-    });
+    return kirim(res, 409, "Data dengan nilai unik tersebut sudah ada", "DATA_DUPLIKAT");
   }
 
-    if (err.code === "P2003") {
-    return res.status(409).json({
-      status: "error",
-      pesan: "Data masih dipakai oleh data lain dan tidak bisa dihapus",
-    });
+  if (err.code === "P2003") {
+    return kirim(
+      res,
+      409,
+      "Data masih dipakai oleh data lain dan tidak bisa dihapus",
+      "DATA_MASIH_DIPAKAI"
+    );
   }
 
   console.error(err);
-  res.status(500).json({
-    status: "error",
-    pesan: "Terjadi kesalahan pada server",
-  });
+  kirim(res, 500, "Terjadi kesalahan pada server", "SERVER_ERROR");
 };
 
 module.exports = errorHandler;

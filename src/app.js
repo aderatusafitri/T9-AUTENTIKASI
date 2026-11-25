@@ -3,6 +3,7 @@ const logger = require("./middleware/logger");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const errorHandler = require("./middleware/errorHandler");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.get("/", (req, res) => {
   res.json({ pesan: "API Products berjalan" });
 });
 
+app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 

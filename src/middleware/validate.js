@@ -8,7 +8,7 @@ const validate = (schema) => (req, res, next) => {
 
   if (error) {
     const pesan = error.details.map((d) => d.message).join("; ");
-    return next(new AppError(422, pesan));
+    return next(new AppError(422, pesan, "VALIDATION_ERROR"));
   }
 
   req.body = value;

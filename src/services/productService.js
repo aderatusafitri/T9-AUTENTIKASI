@@ -24,7 +24,7 @@ const getAll = async ({ halaman, ukuran, category }) => {
 const getById = async (id) => {
   const product = await productData.findById(id);
   if (!product) {
-    throw new AppError(404, "Produk tidak ditemukan");
+    throw new AppError(404, "Produk tidak ditemukan", "PRODUK_TIDAK_DITEMUKAN");
   }
   return product;
 };
@@ -32,7 +32,7 @@ const getById = async (id) => {
 const create = async (data) => {
   const existing = await productData.findBySku(data.sku);
   if (existing) {
-    throw new AppError(409, `SKU ${data.sku} sudah digunakan`);
+    throw new AppError(409, `SKU ${data.sku} sudah digunakan`, "SKU_DUPLIKAT");
   }
   return productData.create(data);
 };
@@ -40,13 +40,13 @@ const create = async (data) => {
 const update = async (id, data) => {
   const product = await productData.findById(id);
   if (!product) {
-    throw new AppError(404, "Produk tidak ditemukan");
+    throw new AppError(404, "Produk tidak ditemukan", "PRODUK_TIDAK_DITEMUKAN");
   }
 
   if (data.sku !== product.sku) {
     const skuOwner = await productData.findBySuku(data.suku);
     if (skuOwner) {
-      throw new AppError(409, 'SKU ${data.sku} sudah digunakan produk lain');
+      throw new AppError(409, `SKU ${data.sku} sudah digunakan produk lain`, "SKU_DUPLIKAT");
     }
   }
 
@@ -56,7 +56,7 @@ const update = async (id, data) => {
 const remove = async (id) => {
   const product = await productData.findById(id);
   if (!product) {
-    throw new AppError(404, "Produk tidak ditemukan");
+    throw new AppError(404, "Produk tidak ditemukan", "PRODUK_TIDAK_DITEMUKAN");
   }
   await productData.remove(id);
 };

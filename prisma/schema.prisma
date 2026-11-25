@@ -31,3 +31,12 @@ model Order {
 
   @@map("orders")
 }
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique @db.VarChar(100)
+  passwordHash String   @db.VarChar(100)
+  createdAt    DateTime @default(now())
+
+  @@map("users")
+}

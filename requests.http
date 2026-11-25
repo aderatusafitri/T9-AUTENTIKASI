@@ -1,213 +1,117 @@
 @baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzk1NjE1MTc0LCJleHAiOjE3OTU2MjIzNzR9.A2Ei0WvrD2OhAii5pMhK-GT2O8P_2ah762te0oX4DP8
+@tokenPalsu = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTk5LCJpYXQiOjE3OTU2MTIyNDksImV4cCI6MTc5NTYxOTQ0OX0.r3MNtQ_LkMLqjVBR1waN3DauBcFvXShmBix_8VfNzmg
+@tokenExpired = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzk1NjEyOTYxLCJleHAiOjE3OTU2MTI5NjZ9.D2Q-0Ill1GrgmBlLTJJV6L2OYpka6i5ZY0HM8hr-9IM
 
 ###############################
-# PRODUCTS: GET daftar
+# AUTENTIKASI
 ###############################
 
-### Daftar produk, default (200)
+### 1. Register (201; ulang = 409 EMAIL_DUPLIKAT)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{ "email": "aderatu@gmail.com", "password": "rahasia123" }
+
+### Register tidak valid (422 VALIDATION_ERROR)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{ "email": "bukan-email", "password": "123" }
+
+### 2. Login (200 OK)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "aderatu@gmail.com", "password": "rahasia123" }
+
+### Login gagal, password salah (401 LOGIN_GAGAL)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "aderatu@gmail.com", "password": "salah-banget" }
+
+### Login gagal, email tidak terdaftar (401 LOGIN_GAGAL, pesan sama)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "tidakada@contoh.com", "password": "rahasia123" }
+
+### /auth/saya tanpa token (401 TOKEN_DIPERLUKAN)
+GET {{baseUrl}}/auth/saya
+
+### /auth/saya dengan token (200)
+GET {{baseUrl}}/auth/saya
+Authorization: Bearer {{token}}
+
+###############################
+# HALAMAN PUBLIK
+###############################
+
+### 3. Daftar produk tanpa token (200)
 GET {{baseUrl}}/products
 
-### Paginasi halaman 2, ukuran 3 (200)
-GET {{baseUrl}}/products?halaman=2&ukuran=3
-
-### Filter kategori Fashion (200)
-GET {{baseUrl}}/products?category=Fashion
-
-### Filter kategori Buku + paginasi (200)
-GET {{baseUrl}}/products?category=Buku&halaman=1&ukuran=1
-
-###############################
-# PRODUCTS: GET detail
-###############################
-
-### Detail produk (200)
+### Detail produk tanpa token (200)
 GET {{baseUrl}}/products/1
 
-### Produk tidak ada (404)
-GET {{baseUrl}}/products/999
-
-### ID tidak valid (400)
-GET {{baseUrl}}/products/abc
-
-###############################
-# PRODUCTS: POST
-###############################
-
-### Tambah produk (201)
-# @name createProduct
-POST {{baseUrl}}/products
-Content-Type: application/json
-
-{
-  "name": "Headset Gaming - Ade Ratu Safitri",
-  "sku": "ELK-004",
-  "category": "Elektronik",
-  "price": 350000,
-  "stock": 20
-}
-
-### SKU duplikat (409)
-POST {{baseUrl}}/products
-Content-Type: application/json
-
-{
-  "name": "Produk Duplikat - Ade Ratu Safitri",
-  "sku": "ELK-001",
-  "category": "Elektronik",
-  "price": 100000,
-  "stock": 5
-}
-
-### Data tidak valid: name kosong dan price negatif (422)
-POST {{baseUrl}}/products
-Content-Type: application/json
-
-{
-  "name": "",
-  "sku": "TST-422",
-  "category": "Elektronik",
-  "price": -100,
-  "stock": 5
-}
-
-### Field kurang (422)
-POST {{baseUrl}}/products
-Content-Type: application/json
-
-{
-  "name": "Tanpa SKU"
-}
-
-### JSON rusak (400)
-POST {{baseUrl}}/products
-Content-Type: application/json
-
-{ 
-  "name": "rusak",
-}
-
-###############################
-# PRODUCTS: PUT
-###############################
-
-### Ubah produk yang baru dibuat (200)
-PUT {{baseUrl}}/products/{{createProduct.response.body.data.id}}
-Content-Type: application/json
-
-{
-  "name": "Headset Gaming Pro - Ade Ratu Safitri",
-  "sku": "ELK-004",
-  "category": "Elektronik",
-  "price": 400000,
-  "stock": 15
-}
-
-### Produk tidak ada (404)
-PUT {{baseUrl}}/products/999
-Content-Type: application/json
-
-{
-  "name": "Tidak Ada",
-  "sku": "XXX-999",
-  "category": "Elektronik",
-  "price": 1000,
-  "stock": 1
-}
-
-### SKU bentrok dengan produk lain (409)
-PUT {{baseUrl}}/products/{{createProduct.response.body.data.id}}
-Content-Type: application/json
-
-{
-  "name": "Headset Gaming Pro - Ade Ratu Safitri",
-  "sku": "ELK-001",
-  "category": "Elektronik",
-  "price": 400000,
-  "stock": 15
-}
-
-### Data tidak lengkap (422)
-PUT {{baseUrl}}/products/{{createProduct.response.body.data.id}}
-Content-Type: application/json
-
-{
-  "name": "Hanya nama"
-}
-
-### ID tidak valid (400)
-PUT {{baseUrl}}/products/abc
-Content-Type: application/json
-
-{
-  "name": "Test",
-  "sku": "TST-001",
-  "category": "Elektronik",
-  "price": 1000,
-  "stock": 1
-}
-
-###############################
-# ORDERS
-###############################
-
-### Buat pesanan, berhasil (201)
-POST {{baseUrl}}/orders
-Content-Type: application/json
-
-{
-  "productId": 1,
-  "customerName": "Ade Ratu Safitri",
-  "quantity": 2
-}
-
-### Stok tidak cukup (409)
-POST {{baseUrl}}/orders
-Content-Type: application/json
-
-{
-  "productId": 1,
-  "customerName": "Ade Ratu Safitri",
-  "quantity": 999
-}
-
-### Produk tidak ada (404)
-POST {{baseUrl}}/orders
-Content-Type: application/json
-
-{
-  "productId": 999,
-  "customerName": "Ade Ratu Safitri",
-  "quantity": 1
-}
-
-### Quantity 0 (422)
-POST {{baseUrl}}/orders
-Content-Type: application/json
-
-{
-  "productId": 1,
-  "customerName": "Ade Ratu Safitri",
-  "quantity": 0
-}
-
-### Daftar pesanan beserta produk (200)
+### Daftar pesanan tanpa token (200)
 GET {{baseUrl}}/orders
 
 ###############################
-# PRODUCTS: DELETE
+# HALAMAN WAJIB LOGIN
 ###############################
 
-### Hapus produk yang punya pesanan, ditolak (409)
-DELETE {{baseUrl}}/products/1
+### 4. Tambah produk TANPA token (401 TOKEN_DIPERLUKAN)
+POST {{baseUrl}}/products
+Content-Type: application/json
 
-### Hapus produk yang baru dibuat (204)
-DELETE {{baseUrl}}/products/{{createProduct.response.body.data.id}}
+{ "name": "Produk Auth - Ade Ratu Safitri", "sku": "AUT-002", "category": "Elektronik", "price": 50000, "stock": 5 }
 
-### Hapus lagi, sudah tidak ada (404)
-DELETE {{baseUrl}}/products/{{createProduct.response.body.data.id}}
+### 5. Tambah produk DENGAN token (201)
+# @name tambahProduk
+POST {{baseUrl}}/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
-### ID tidak valid (400)
-DELETE {{baseUrl}}/products/abc
+{ "name": "Produk Auth - Ade Ratu Safitri", "sku": "AUT-002", "category": "Elektronik", "price": 50000, "stock": 5 }
 
-### Error server, MySQL dimatikan (500)
-GET {{baseUrl}}/products
+### Ubah produk dengan token (200)
+PUT {{baseUrl}}/products/{{tambahProduk.response.body.data.id}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "name": "Produk Auth v2", "sku": "AUT-002", "category": "Elektronik", "price": 60000, "stock": 5 }
+
+### Buat pesanan tanpa token (401)
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{ "productId": 1, "customerName": "Ade", "quantity": 1 }
+
+### Buat pesanan dengan token (201)
+POST {{baseUrl}}/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ "productId": 1, "customerName": "Ade", "quantity": 1 }
+
+### Hapus produk tanpa token (401)
+DELETE {{baseUrl}}/products/{{tambahProduk.response.body.data.id}}
+
+### Hapus produk dengan token (204)
+DELETE {{baseUrl}}/products/{{tambahProduk.response.body.data.id}}
+Authorization: Bearer {{token}}
+
+###############################
+# PERCOBAAN WAJIB
+###############################
+
+### Percobaan 1: token dipalsukan (401 TOKEN_TIDAK_VALID)
+# ADE RATU SAFITRI - F1D02410033
+GET {{baseUrl}}/auth/saya
+Authorization: Bearer {{tokenPalsu}}
+
+### Percobaan 2: token expired (401 TOKEN_TIDAK_VALID)
+# ADE RATU SAFITRI - F1D02410033
+GET {{baseUrl}}/auth/saya
+Authorization: Bearer {{tokenExpired}}

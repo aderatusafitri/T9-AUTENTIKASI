@@ -9,7 +9,7 @@ const toPositiveInt = (value, fallback) => {
 const parseId = (value) => {
   const id = Number(value);
   if (!Number.isInteger(id) || id <= 0) {
-    throw new AppError(400, "ID harus berupa bilangan bulat positif");
+    throw new AppError(400, "ID harus berupa bilangan bulat positif", "ID_TIDAK_VALID");
   }
   return id;
 };
